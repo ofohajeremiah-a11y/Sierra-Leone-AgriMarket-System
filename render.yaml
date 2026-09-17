@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: agrimarket-platform
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: cd backend && gunicorn agri_market.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/markets/
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrimarket-db
+          property: connectionString
+
+databases:
+  - name: agrimarket-db
+    plan: free
+    databaseName: agrimarket
+    user: agrimarket
