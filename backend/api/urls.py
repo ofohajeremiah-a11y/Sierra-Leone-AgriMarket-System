@@ -1,19 +1,4 @@
 from django.urls import path
 from . import views
-
-urlpatterns = [
-    path('auth/register/', views.register),
-    path('auth/login/', views.login),
-    path('overview/', views.overview),
-    path('markets/', views.markets),
-    path('commodities/', views.commodities),
-    path('prices/', views.prices),
-    path('prices/submit/', views.submit_price),
-    path('forecasts/', views.forecasts),
-    path('recommendations/', views.recommendations),
-    path('alerts/', views.alerts),
-    path('alerts/<int:alert_id>/read/', views.mark_alert_read),
-    path('alerts/read-all/', views.mark_all_alerts_read),
-    path('reports/', views.report),
-    path('ussd/', views.ussd),
-]
+urlpatterns=[
+ path('auth/register/',views.register),path('auth/login/',views.login),path('overview/',views.overview),path('markets/',views.markets),path('commodities/',views.commodities),path('prices/',views.prices),path('prices/submit/',views.submit_price),path('prices/validate/',views.validate_prices),path('prices/import/',views.import_prices),path('forecasts/',views.forecasts),path('forecast-scores/',views.model_scores),path('recommendations/',views.recommendations),path('optimize/',views.optimize),path('routes/',views.route_list),path('climate/',views.climate),path('macro/',views.macro),path('supply-demand/',views.supply_demand),path('alerts/',views.alerts),path('alerts/<int:alert_id>/read/',views.mark_alert_read),path('alerts/read-all/',views.mark_all_alerts_read),path('subscriptions/',views.subscriptions),path('reports/',views.report),path('ussd/',views.ussd)]

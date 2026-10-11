@@ -1,61 +1,58 @@
-# Sierra Leone AgriMarket Intelligence Platform
+# Sierra Leone AgriMarket Intelligence Platform — Enhanced Group 4 Build
 
-A working academic prototype for collecting agricultural market prices, validating submissions, generating 7-day price forecasts, producing supply-chain recommendations, and exposing a low-bandwidth USSD-style interface.
+This is the enhanced academic prototype aligned with the Group 4 project specification: food price forecasting + supply-chain optimization + low-bandwidth access.
 
-## Technology
-- Backend: Django + Django REST Framework + SQLite (PostgreSQL-ready)
-- Forecasting: ARIMA(1,1,1) when sufficient history and `statsmodels` are available; transparent trend fallback otherwise
-- Frontend: React + Vite + Recharts
-- Admin: Django Admin
-- USSD: provider-independent webhook at `/api/ussd/`
+## Stack
+- Django 5.2 + Django REST Framework
+- React + Vite + Recharts
+- PostgreSQL-ready / SQLite for local development
+- statsmodels, scikit-learn, optional XGBoost, PuLP
+- WhiteNoise for production static files
+- Render deployment configuration
 
-## Included pilot data
-Markets: Freetown, Bo, Makeni
-Commodities: Rice, Cassava, Groundnuts
-The seed command creates 28 days of deterministic demonstration prices.
+## Major modules
+1. Authentication and role management
+2. Market and commodity data
+3. Price import and validation
+4. Climate and macroeconomic indicators
+5. Multi-model forecasting (1–12 weeks)
+6. Forecast evaluation (MAE/RMSE/MAPE)
+7. Supply-chain transportation optimization
+8. Blocked-road and demand-shock scenarios
+9. Market opportunity recommendations
+10. Early-warning price alerts
+11. PDF/CSV reporting
+12. USSD simulator and SMS subscription preference
+13. Django Administration
 
-## IDE support
-
-This project is IDE-independent and can be developed in Visual Studio Code or Eclipse with PyDev. The application itself runs from Python/Node commands, not from a specific IDE.
-
-See `RUN_GUIDE.md` for the beginner-friendly setup.
-
-## Windows installation
-1. Install Python 3.11+ and Node.js 18+.
-2. Double-click `setup_windows.bat`.
-3. Double-click `start_backend.bat`.
-4. In a second terminal, double-click `start_frontend.bat`.
-5. Open the Vite URL shown in the terminal.
-
-### Demo administrator
+## Demo login
 Username: `admin`
 Password: `admin123`
 
-Change this password before any real deployment.
+Change the password before any real deployment.
 
-## API endpoints
-- `POST /api/auth/register/`
-- `POST /api/auth/login/`
-- `GET /api/overview/`
-- `GET /api/markets/`
-- `GET /api/commodities/`
-- `GET /api/prices/`
-- `POST /api/prices/submit/`
-- `GET|POST /api/forecasts/`
-- `POST /api/recommendations/`
-- `GET /api/alerts/`
-- `GET /api/reports/`
-- `POST /api/ussd/`
-- `/admin/`
+## Local setup
+### Backend
+```text
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_demo
+python manage.py runserver
+```
 
-## USSD demo
-Send an HTTP POST to `/api/ussd/` with `sessionId` and `text`.
-Examples of menu progression:
-- empty text → main menu
-- `1` → commodity menu
-- `1*1` → market menu
-- `1*1*1` → current Rice price in Freetown
-- `2*1*1` → 7-day Rice forecast in Freetown
+### Frontend
+```text
+cd frontend
+npm install
+npm run dev
+```
 
-## Academic integrity
-The project does not fabricate evaluation results. Real usability/accuracy percentages should be entered only after the system has been tested with actual participants and data.
+The frontend uses `http://127.0.0.1:8000/api` in development.
+
+## Production
+The Render build creates the React production bundle and collects it into Django/WhiteNoise static storage. The Vite production base is `/static/`, preventing the previous Render white-screen asset problem.
+
+See `docs/PDF_FEATURE_IMPLEMENTATION.md` for the exact mapping between the project specification and this implementation.

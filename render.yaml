@@ -7,6 +7,8 @@ services:
     startCommand: cd backend && gunicorn agri_market.wsgi:application --bind 0.0.0.0:$PORT
     healthCheckPath: /api/markets/
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DEBUG
@@ -15,7 +17,6 @@ services:
         fromDatabase:
           name: agrimarket-db
           property: connectionString
-
 databases:
   - name: agrimarket-db
     plan: free
