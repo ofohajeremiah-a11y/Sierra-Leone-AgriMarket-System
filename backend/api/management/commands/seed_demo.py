@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta, date
 import random
+from decimal import Decimal
 from api.models import *
 class Command(BaseCommand):
  def handle(self,*args,**kwargs):
@@ -24,7 +25,7 @@ class Command(BaseCommand):
    for i in range(180):
     d=(now-timedelta(days=179-i)).date(); ClimateRecord.objects.get_or_create(market=m,date=d,defaults={'rainfall_mm':max(0,random.gauss(7,10)),'temperature_c':27+random.uniform(-2,2),'source':'demo'})
    for c in Commodity.objects.all():
-    SupplyDemandRecord.objects.get_or_create(market=m,commodity=c,date=now.date(),defaults={'supply_qty':m.supply_capacity*random.uniform(.6,1),'demand_qty':m.demand_baseline*random.uniform(.7,1.15),'source':'demo'})
+    SupplyDemandRecord.objects.get_or_create(market=m,commodity=c,date=now.date(),defaults={'supply_qty':m.supply_capacity*Decimal(str(random.uniform(.6,1))),'demand_qty':m.demand_baseline*Decimal(str(random.uniform(.7,1.15))),'source':'demo'})
   ms=list(Market.objects.all())
   for a in ms:
    for b in ms:
