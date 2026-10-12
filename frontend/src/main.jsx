@@ -7,7 +7,9 @@ async function api(path,options={}){const r=await fetch(API+path,options);const 
 const fmt=v=>v==null||v===''?'—':`Le ${Number(v).toLocaleString('en-SL',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 const ROLES={farmer:'Farmer',trader:'Trader',transporter:'Transporter',field_agent:'Field Agent',policymaker:'Policy Maker',analyst:'Analyst',admin:'Administrator'};
 const NAV={farmer:['Dashboard','Prices','Forecasting','Supply Chain','Alerts','USSD/SMS'],trader:['Dashboard','Prices','Forecasting','Supply Chain','Alerts','USSD/SMS'],transporter:['Dashboard','Supply Chain','Prices','Alerts','USSD/SMS'],field_agent:['Dashboard','Prices','Data Validation','Alerts','USSD/SMS'],policymaker:['Dashboard','Prices','Forecasting','Supply Chain','Reports','Climate & Economy','Alerts','USSD/SMS'],analyst:['Dashboard','Prices','Forecasting','Supply Chain','Reports','Climate & Economy','Data Validation','Alerts','USSD/SMS'],admin:['Dashboard','Prices','Forecasting','Supply Chain','Reports','Climate & Economy','Data Validation','Alerts','USSD/SMS','Administration']};
-  const [identifier, setIdentifier] = useState('');
+ function Login({onLogin}) {
+  const [mode, setMode] = useState('login');
+ const [identifier, setIdentifier] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -173,7 +175,7 @@ const NAV={farmer:['Dashboard','Prices','Forecasting','Supply Chain','Alerts','U
           </button>
         </div>
 
-        {mode === 'login' && (
+                {mode === 'login' && (
           <div className="demo-box">
             <b>Demo administrator</b>
             <br />
@@ -183,6 +185,7 @@ const NAV={farmer:['Dashboard','Prices','Forecasting','Supply Chain','Alerts','U
       </div>
     </div>
   );
+}
 
 function App(){const [user,setUser]=useState(null);if(!user)return <Login onLogin={setUser}/>;return <Main user={user} logout={()=>setUser(null)}/>}
 function Main({user,logout}){const nav=NAV[user.role]||NAV.farmer;const [tab,setTab]=useState('Dashboard'),[markets,setMarkets]=useState([]),[commodities,setCommodities]=useState([]),[prices,setPrices]=useState([]),[forecasts,setForecasts]=useState([]),[alerts,setAlerts]=useState([]),[overview,setOverview]=useState({}),[selected,setSelected]=useState({market:'',commodity:''});const [busy,setBusy]=useState(false);const refresh=async()=>{const [m,c,o,p,a,f]=await Promise.all([api('/markets/'),api('/commodities/'),api(`/overview/?user=${user.id}`),api('/prices/'),api(`/alerts/?user=${user.id}`),api('/forecasts/')]);setMarkets(m);setCommodities(c);setOverview(o);setPrices(p);setAlerts(a);setForecasts(f)};useEffect(()=>{refresh().catch(console.error)},[]);useEffect(()=>{if(!selected.market&&markets[0])setSelected(s=>({...s,market:markets[0].id}));if(!selected.commodity&&commodities[0])setSelected(s=>({...s,commodity:commodities[0].id}))},[markets,commodities]);const generate=async weeks=>{if(!selected.market||!selected.commodity)return;setBusy(true);try{const d=await api('/forecasts/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:selected.market,commodity:selected.commodity,weeks:weeks||1})});setForecasts(d.forecasts);alert(`Best model: ${d.best_model}. Models compared: ${d.scores.length}.`);refresh()}catch(e){alert(e.message)}finally{setBusy(false)}};const current=prices.find(p=>String(p.market)===String(selected.market)&&String(p.commodity)===String(selected.commodity));const prev=prices.filter(p=>String(p.market)===String(selected.market)&&String(p.commodity)===String(selected.commodity)&&p.id!==current?.id)[1]||prices.find(p=>String(p.market)===String(selected.market)&&String(p.commodity)===String(selected.commodity));const navClick=x=>setTab(x);return <div className="shell"><aside className="sidebar"><div className="sidebar-brand"><span>🌾</span><div><b>AGRI-MARKET</b><small>INTELLIGENCE</small></div></div><div className="role-badge">{ROLES[user.role]}</div><nav>{nav.map(x=><button className={tab===x?'nav-item active':'nav-item'} key={x} onClick={()=>navClick(x)}>{x}</button>)}</nav><button className="logout" onClick={logout}>Log out</button></aside><main className="content"><header className="topbar"><div><div className="breadcrumb">SIERRA LEONE · MARKET INTELLIGENCE</div><h1>{tab}</h1></div><div className="top-actions"><span className="live-pill">● LIVE DATA</span><div className="profile"><div><b>{user.username}</b><small>{ROLES[user.role]}</small></div><div className="avatar">{user.username?.[0]?.toUpperCase()}</div></div></div></header>{tab==='Dashboard'&&<Dashboard {...{markets,commodities,selected,setSelected,overview,prices,forecasts,alerts,current,prev,generate,busy,setTab}}/>}{tab==='Prices'&&<Prices {...{markets,commodities,selected,setSelected,prices,user,refresh}}/>}{tab==='Forecasting'&&<Forecasting {...{markets,commodities,selected,setSelected,forecasts,prices,generate,busy}}/>}{tab==='Supply Chain'&&<SupplyChain {...{markets,commodities,user}}/>}{tab==='Data Validation'&&<Validation {...{prices,refresh}}/>}{tab==='Reports'&&<Reports {...{markets,commodities,selected,setSelected}}/>}{tab==='Climate & Economy'&&<ClimateEconomy/>}{tab==='Alerts'&&<Alerts {...{alerts,user,refresh}}/>}{tab==='USSD/SMS'&&<USSD user={user}/>} {tab==='Administration'&&<Administration/>}</main></div>}
