@@ -51,6 +51,18 @@ STORAGES={
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
-CORS_ALLOW_ALL_ORIGINS=True
-REST_FRAMEWORK={'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.AllowAny']}
-AUTH_USER_MODEL='api.User'
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [
+'https://agrimarket-platform.onrender.com',
+]
+
+REST_FRAMEWORK = {
+'DEFAULT_PERMISSION_CLASSES': [
+'rest_framework.permissions.AllowAny',
+],
+'DEFAULT_AUTHENTICATION_CLASSES': [],
+}
+
+
+AUTH_USER_MODEL = 'api.User'
